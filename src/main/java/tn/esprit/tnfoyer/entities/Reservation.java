@@ -1,10 +1,14 @@
 package tn.esprit.tnfoyer.entities;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
+
+
 
 @Entity
 public class Reservation {
@@ -17,9 +21,12 @@ public class Reservation {
 
         private boolean estValide;
 
-        @ManyToMany( cascade = CascadeType.ALL)
-        private List<Etudiant> etudiants;
+        @ManyToOne
+        private Chambre chambre;
 
+
+        @ManyToMany
+        private List<Etudiant> etudiants;
 
     public String getIdReservation() {
         return idReservation;
@@ -45,12 +52,31 @@ public class Reservation {
         this.estValide = estValide;
     }
 
+    public Chambre getChambre() {
+        return chambre;
+    }
+
+    public void setChambre(Chambre chambre) {
+        this.chambre = chambre;
+    }
+
     public List<Etudiant> getEtudiants() {
         return etudiants;
     }
 
     public void setEtudiants(List<Etudiant> etudiants) {
         this.etudiants = etudiants;
+    }
+
+    @Override
+    public String toString() {
+        return "Reservation{" +
+                "idReservation='" + idReservation + '\'' +
+                ", anneeUniversitaire=" + anneeUniversitaire +
+                ", estValide=" + estValide +
+                ", chambre=" + chambre +
+                ", etudiants=" + etudiants +
+                '}';
     }
 }
 

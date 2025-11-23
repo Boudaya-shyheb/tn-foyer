@@ -1,6 +1,9 @@
 package tn.esprit.tnfoyer.entities;
 
 import jakarta.persistence.*;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 @Entity
 public class Foyer {
@@ -13,8 +16,11 @@ public class Foyer {
 
     private int capaciteFoyer;
 
-    @OneToOne(mappedBy = "foyer", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "foyer")
     private Universite universite;
+
+    @OneToMany(mappedBy = "foyer", cascade = CascadeType.ALL)
+    private List<Bloc> blocs;
 
     public long getIdFoyer() {
         return idFoyer;
@@ -46,5 +52,13 @@ public class Foyer {
 
     public void setUniversite(Universite universite) {
         this.universite = universite;
+    }
+
+    public List<Bloc> getBlocs() {
+        return blocs;
+    }
+
+    public void setBlocs(List<Bloc> blocs) {
+        this.blocs = blocs;
     }
 }
