@@ -4,6 +4,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 import tn.esprit.tnfoyer.entities.*;
 import tn.esprit.tnfoyer.repositories.ChambreRepository;
+import tn.esprit.tnfoyer.repositories.FoyerRepository;
 import tn.esprit.tnfoyer.repositories.UniversiteRepository;
 import tn.esprit.tnfoyer.services.interfaces.IChambreService;
 
@@ -16,11 +17,13 @@ public class ChambreService implements IChambreService {
 
     private final ChambreRepository chambreRepository;
     private final UniversiteRepository universiteRepository;
+    private final FoyerRepository foyerRepository;
 
 
-    public ChambreService(ChambreRepository chambreRepository, UniversiteRepository universiteRepository) {
+    public ChambreService(ChambreRepository chambreRepository, UniversiteRepository universiteRepository, FoyerRepository foyerRepository) {
         this.chambreRepository = chambreRepository;
         this.universiteRepository = universiteRepository;
+        this.foyerRepository = foyerRepository;
     }
 
     @Override
@@ -69,16 +72,16 @@ public class ChambreService implements IChambreService {
     public List<Chambre> getChambresParNomUniversite(String nomUniversite) {
         Universite universite = universiteRepository.findByNomUniversite(nomUniversite);
         if (universite == null || universite.getFoyer() == null) {
-            return List.of();
+            return null;
         }
         Foyer foyer = universite.getFoyer();
         if (foyer.getBlocs() == null) {
-            return List.of();
+            return null;
         }
         List<Chambre> result = new ArrayList<>();
         for (Bloc bloc : foyer.getBlocs()) {
-            if (bloc.getChambres() != null) {
-                result.addAll(bloc.getChambres());
+            for(Chambre chambre : bloc.getChambres()) {
+                result.add(chambre);
             }
         }
         return result;
@@ -94,27 +97,23 @@ public class ChambreService implements IChambreService {
 
     @Override
     @Transactional
-    public List<Chambre> getChambresNonReserveParNomUniversiteEtTypeChambre(String nomUniversite, TypeChambre type) {
-        if (nomUniversite == null || nomUniversite.isBlank() || type == null) return List.of();
+    public List<Chambre> getChambresNonReserveParNomFoyerEtTypeChambre(String nomFoyer, TypeChambre type) {
 
-        Universite u = universiteRepository.findByNomUniversite(nomUniversite);
-        if (u == null || u.getFoyer() == null || u.getFoyer().getBlocs() == null) return List.of();
+        Foyer f = foyerRepository.findFoyerByNomFoyer(nomFoyer);
 
         LocalDate anneeCourante = LocalDate.now();
         List<Chambre> res = new ArrayList<>();
 
-        for (Bloc b : u.getFoyer().getBlocs()) {
-            if (b.getChambres() == null) continue;
+        for (Bloc b : f.getBlocs()) {
             for (Chambre ch : b.getChambres()) {
-                if (ch.getTypeC() != type) continue;
 
-                boolean aReservationValideCetteAnnee = ch.getReservations() != null
+                boolean reservationValideCetteAnnee = ch.getReservations() != null
                         && ch.getReservations().stream()
                         .anyMatch(r -> r.isEstValide()
                                 && r.getAnneeUniversitaire() != null
                                 && r.getAnneeUniversitaire().isEqual(anneeCourante));
 
-                if (!aReservationValideCetteAnnee) {
+                if (!reservationValideCetteAnnee) {
                     res.add(ch);
                 }
             }

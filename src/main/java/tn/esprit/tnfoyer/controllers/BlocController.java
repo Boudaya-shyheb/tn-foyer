@@ -36,7 +36,7 @@ public class BlocController {
     }
 
     @GetMapping("/{id}")
-    public Object getBloc(@PathVariable("id") long id) {
+    public Bloc getBloc(@PathVariable("id") long id) {
         return blocService.getBloc(id);
     }
 

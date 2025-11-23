@@ -49,12 +49,12 @@ public class BlocService implements IBlocService {
     }
 
     @Override
-    public Object getBloc(Long idBloc) {
+    public Bloc getBloc(Long idBloc) {
         Bloc existingBloc = blocRepository.getById(idBloc);
         if (existingBloc != null) {
             return existingBloc;
         }else {
-            return "Bloc not found";
+            return null;
         }
     }
 
@@ -67,15 +67,16 @@ public class BlocService implements IBlocService {
     @Override
     public Bloc affecterChambresABloc(List<Long> numChambre, long idBloc){
 
+
+
         Bloc b = blocRepository.findById(idBloc).get();
 
         List<Chambre> chambres = new ArrayList<>();
         for (Long i : numChambre ){
-
             Chambre c = chambreRepository.findChambreByNumeroChambre(i);
             if(c!=null){
-                chambres.add(c);
                 c.setBloc(b);
+                chambres.add(c);
             }
 
         }

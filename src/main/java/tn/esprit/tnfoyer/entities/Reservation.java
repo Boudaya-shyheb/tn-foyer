@@ -21,10 +21,6 @@ public class Reservation {
 
         private boolean estValide;
 
-        @ManyToOne
-        private Chambre chambre;
-
-
         @ManyToMany
         private List<Etudiant> etudiants;
 
@@ -52,14 +48,6 @@ public class Reservation {
         this.estValide = estValide;
     }
 
-    public Chambre getChambre() {
-        return chambre;
-    }
-
-    public void setChambre(Chambre chambre) {
-        this.chambre = chambre;
-    }
-
     public List<Etudiant> getEtudiants() {
         return etudiants;
     }
@@ -74,7 +62,6 @@ public class Reservation {
                 "idReservation='" + idReservation + '\'' +
                 ", anneeUniversitaire=" + anneeUniversitaire +
                 ", estValide=" + estValide +
-                ", chambre=" + chambre +
                 ", etudiants=" + etudiants +
                 '}';
     }

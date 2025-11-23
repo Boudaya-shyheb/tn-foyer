@@ -161,21 +161,19 @@ public class ReservationService implements IReservationService {
 
     @Override
     public List<Reservation> getReservationParAnneeUniversitaireEtNomUniversite(Date anneeUniversitaire, String nomUniversite) {
-        if (anneeUniversitaire == null || nomUniversite == null || nomUniversite.isBlank()) {
-            return List.of();
-        }
+
         LocalDate annee = anneeUniversitaire.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 
         Universite u = universiteRepository.findByNomUniversite(nomUniversite);
-        if (u == null || u.getFoyer() == null) return List.of();
+        if (u == null || u.getFoyer() == null)
+            return null;
 
         List<Reservation> res = new ArrayList<>();
-        if (u.getFoyer().getBlocs() == null) return res;
+        if (u.getFoyer().getBlocs() == null)
+            return res;
 
         for (Bloc b : u.getFoyer().getBlocs()) {
-            if (b.getChambres() == null) continue;
             for (Chambre ch : b.getChambres()) {
-                if (ch.getReservations() == null) continue;
                 for (Reservation r : ch.getReservations()) {
                     if (r.isEstValide()
                             && r.getAnneeUniversitaire() != null
