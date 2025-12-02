@@ -123,4 +123,6 @@ public class FoyerService implements IFoyerService {
                 .orElseThrow(() -> new RuntimeException("Foyer introuvable avec ID : " + idFoyer));
         return foyerMapper.toDto(foyer);
     }
+
+
 }
