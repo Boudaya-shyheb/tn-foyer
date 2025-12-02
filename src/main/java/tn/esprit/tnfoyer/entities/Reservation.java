@@ -24,6 +24,9 @@ public class Reservation {
         @ManyToMany
         private List<Etudiant> etudiants;
 
+        @ManyToOne
+        private Chambre chambre;
+
     public String getIdReservation() {
         return idReservation;
     }
@@ -54,6 +57,14 @@ public class Reservation {
 
     public void setEtudiants(List<Etudiant> etudiants) {
         this.etudiants = etudiants;
+    }
+
+    public Chambre getChambre() {
+        return chambre;
+    }
+
+    public void setChambre(Chambre chambre) {
+        this.chambre = chambre;
     }
 
     @Override

@@ -1,19 +1,24 @@
 package tn.esprit.tnfoyer.services.implementation;
 
 import org.springframework.stereotype.Service;
+import tn.esprit.tnfoyer.dto.EtudiantDTO;
 import tn.esprit.tnfoyer.entities.Etudiant;
+import tn.esprit.tnfoyer.mapper.EtudiantMapper;
 import tn.esprit.tnfoyer.repositories.EtudiantRepository;
 import tn.esprit.tnfoyer.services.interfaces.IEtudiantService;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class EtudiantService implements IEtudiantService {
 
     private final EtudiantRepository etudiantRepository;
+    private final EtudiantMapper etudiantMapper;
 
-    public EtudiantService(EtudiantRepository etudiantRepository) {
+    public EtudiantService(EtudiantRepository etudiantRepository, EtudiantMapper etudiantMapper) {
         this.etudiantRepository = etudiantRepository;
+        this.etudiantMapper = etudiantMapper;
     }
 
     @Override
@@ -57,4 +62,27 @@ public class EtudiantService implements IEtudiantService {
     public List<Etudiant> getAllEtudiant() {
         return etudiantRepository.findAll();
     }
+
+    @Override
+    public EtudiantDTO addOrUpdateEtudiant(EtudiantDTO etudiantDTO) {
+        Etudiant etudiant = etudiantMapper.toEntity(etudiantDTO);
+        Etudiant saved = etudiantRepository.save(etudiant);
+        return etudiantMapper.toDto(saved);
+    }
+
+    @Override
+    public List<EtudiantDTO> findAllEtudiants() {
+        return etudiantRepository.findAll()
+                .stream()
+                .map(etudiantMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public EtudiantDTO findById(long idEtudiant) {
+        Etudiant etudiant = etudiantRepository.findById(idEtudiant)
+                .orElseThrow(() -> new RuntimeException("Étudiant non trouvé"));
+        return etudiantMapper.toDto(etudiant);
+    }
+
 }

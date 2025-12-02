@@ -60,4 +60,10 @@ public class Bloc {
     public void setChambres(List<Chambre> chambres) {
         this.chambres = chambres;
     }
+
+    @Override
+    public String toString() {
+        return "Bloc{" + "idBloc=" + idBloc + ", nomBloc='" + nomBloc + '\'' + ", capaciteBloc=" + capaciteBloc + '}';
+    }
+
 }

@@ -2,23 +2,28 @@ package tn.esprit.tnfoyer.services.implementation;
 
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
+import tn.esprit.tnfoyer.dto.UniversiteDTO;
 import tn.esprit.tnfoyer.entities.Foyer;
 import tn.esprit.tnfoyer.entities.Universite;
+import tn.esprit.tnfoyer.mapper.UniversiteMapper;
 import tn.esprit.tnfoyer.repositories.FoyerRepository;
 import tn.esprit.tnfoyer.repositories.UniversiteRepository;
 import tn.esprit.tnfoyer.services.interfaces.IUniversiteService;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class UniversiteService implements IUniversiteService {
 
     private final UniversiteRepository universiteRepository;
     private final FoyerRepository foyerRepository;
+    private final UniversiteMapper universiteMapper;
 
-    public UniversiteService(UniversiteRepository universiteRepository, FoyerRepository foyerRepository ) {
+    public UniversiteService(UniversiteRepository universiteRepository, FoyerRepository foyerRepository, UniversiteMapper universiteMapper) {
         this.universiteRepository = universiteRepository;
         this.foyerRepository = foyerRepository;
+        this.universiteMapper = universiteMapper;
     }
 
     @Override
@@ -90,5 +95,26 @@ public class UniversiteService implements IUniversiteService {
         return universiteRepository.save(u);
     }
 
+    @Override
+    public UniversiteDTO addOrUpdateUniversite(UniversiteDTO universiteDTO) {
+        Universite universite = universiteMapper.toEntity(universiteDTO);
+        Universite saved = universiteRepository.save(universite);
+        return universiteMapper.toDto(saved);
+    }
+
+    @Override
+    public List<UniversiteDTO> findAllUniversites() {
+        return universiteRepository.findAll()
+                .stream()
+                .map(universiteMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public UniversiteDTO findById(long idUniversite) {
+        Universite universite = universiteRepository.findById(idUniversite)
+                .orElseThrow(() -> new RuntimeException("Université non trouvée"));
+        return universiteMapper.toDto(universite);
+    }
 
 }

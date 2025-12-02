@@ -2,11 +2,10 @@ package tn.esprit.tnfoyer.services.implementation;
 
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
+import tn.esprit.tnfoyer.dto.ReservationDTO;
 import tn.esprit.tnfoyer.entities.*;
-import tn.esprit.tnfoyer.repositories.BlocRepository;
-import tn.esprit.tnfoyer.repositories.EtudiantRepository;
-import tn.esprit.tnfoyer.repositories.ReservationRepository;
-import tn.esprit.tnfoyer.repositories.UniversiteRepository;
+import tn.esprit.tnfoyer.mapper.ReservationMapper;
+import tn.esprit.tnfoyer.repositories.*;
 import tn.esprit.tnfoyer.services.interfaces.IReservationService;
 
 import java.awt.*;
@@ -15,6 +14,7 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ReservationService implements IReservationService {
@@ -23,12 +23,16 @@ public class ReservationService implements IReservationService {
     private final BlocRepository blocRepository;
     private final EtudiantRepository etudiantRepository;
     private final UniversiteRepository universiteRepository;
+    private final ReservationMapper reservationMapper;
+    private final ChambreRepository chambreRepository;
 
-    public ReservationService(ReservationRepository reservationRepository, BlocRepository blocRepository, EtudiantRepository etudiantRepository, UniversiteRepository universiteRepository) {
+    public ReservationService(ReservationRepository reservationRepository, BlocRepository blocRepository, EtudiantRepository etudiantRepository, UniversiteRepository universiteRepository, ReservationMapper reservationMapper, ChambreRepository chambreRepository) {
         this.reservationRepository = reservationRepository;
         this.blocRepository = blocRepository;
         this.etudiantRepository = etudiantRepository;
         this.universiteRepository = universiteRepository;
+        this.reservationMapper = reservationMapper;
+        this.chambreRepository = chambreRepository;
     }
 
     @Override
@@ -76,7 +80,8 @@ public class ReservationService implements IReservationService {
     @Override
     public Reservation ajouterReservation(long idBloc, long cinEtudiant) {
         Bloc bloc = blocRepository.findById(idBloc).get();
-        if (bloc == null || bloc.getChambres() == null || bloc.getChambres().isEmpty()) {
+        List<Chambre> chambres = chambreRepository.findChambresByBlocIdBloc(idBloc);
+        if (bloc == null || chambres.isEmpty()) {
             throw new IllegalArgumentException("Bloc introuvable ou sans chambres");
         }
 
@@ -87,7 +92,7 @@ public class ReservationService implements IReservationService {
 
 
         Chambre chambre = null;
-        for (Chambre ch : bloc.getChambres()) {
+        for (Chambre ch : chambres) {
             int capaciteMax = switch (ch.getTypeC()) {
                 case SIMPLE -> 1;
                 case DOUBLE -> 2;
@@ -111,31 +116,22 @@ public class ReservationService implements IReservationService {
         LocalDate anneeUniversitaire = LocalDate.now();
         String numReservation = chambre.getNumeroChambre() + "-" + bloc.getNomBloc() + "-" + anneeUniversitaire;
 
-        System.out.println("1");
+        Reservation reservation = reservationRepository.findById(numReservation).orElse(null);
+        if (reservation == null) {
+            reservation = new Reservation();
+            reservation.setIdReservation(numReservation);
+            reservation.setAnneeUniversitaire(anneeUniversitaire);
+            reservation.setEstValide(true);
+            reservation.setChambre(chambre);
+        }
 
-        Reservation reservation = new Reservation();
-        reservation.setIdReservation(numReservation);
-        reservation.setAnneeUniversitaire(anneeUniversitaire);
-        reservation.setEstValide(true);
-
-        System.out.println("2");
-
-        List<Etudiant> etudiants = new ArrayList<>();
-        etudiants.add(etudiant);
+        List<Etudiant> etudiants = reservation.getEtudiants() == null ? new ArrayList<>() : new ArrayList<>(reservation.getEtudiants());
+        if (etudiants.stream().noneMatch(e -> e.getIdEtudiant() == etudiant.getIdEtudiant())) {
+            etudiants.add(etudiant);
+        }
         reservation.setEtudiants(etudiants);
 
-        System.out.println("3");
-
-        if (chambre.getReservations() == null) {
-            chambre.setReservations(new ArrayList<>());
-        }
-        chambre.getReservations().add(reservation);
-
-        System.out.println("4");
-        System.out.println(reservation.toString());
-
         return reservationRepository.save(reservation);
-
     }
 
     @Override
@@ -162,27 +158,39 @@ public class ReservationService implements IReservationService {
     @Override
     public List<Reservation> getReservationParAnneeUniversitaireEtNomUniversite(Date anneeUniversitaire, String nomUniversite) {
 
-        LocalDate annee = anneeUniversitaire.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-
-        Universite u = universiteRepository.findByNomUniversite(nomUniversite);
-        if (u == null || u.getFoyer() == null)
-            return null;
-
-        List<Reservation> res = new ArrayList<>();
-        if (u.getFoyer().getBlocs() == null)
-            return res;
-
-        for (Bloc b : u.getFoyer().getBlocs()) {
-            for (Chambre ch : b.getChambres()) {
-                for (Reservation r : ch.getReservations()) {
-                    if (r.isEstValide()
-                            && r.getAnneeUniversitaire() != null
-                            && r.getAnneeUniversitaire().isEqual(annee)) {
-                        res.add(r);
-                    }
+        List<Chambre> chambres = chambreRepository.findChambresByBlocFoyerUniversiteNomUniversite(nomUniversite);
+        List<Reservation> res = reservationRepository.findAll();
+        for (Reservation r : res) {
+            for (Chambre c : chambres) {
+                if (r.getChambre().getIdChambre() != c.getIdChambre() && anneeUniversitaire.getYear() != r.getAnneeUniversitaire().getYear() && !r.isEstValide()) {
+                    res.remove(r);
                 }
             }
         }
+
         return res;
     }
+
+    @Override
+    public ReservationDTO addOrUpdateReservation(ReservationDTO reservationDTO) {
+        Reservation reservation = reservationMapper.toEntity(reservationDTO);
+        Reservation saved = reservationRepository.save(reservation);
+        return reservationMapper.toDto(saved);
+    }
+
+    @Override
+    public List<ReservationDTO> findAllReservations() {
+        return reservationRepository.findAll()
+                .stream()
+                .map(reservationMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public ReservationDTO findById(String idReservation) {
+        Reservation reservation = reservationRepository.findById(idReservation)
+                .orElseThrow(() -> new RuntimeException("Réservation non trouvée"));
+        return reservationMapper.toDto(reservation);
+    }
+
 }

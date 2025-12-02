@@ -20,7 +20,7 @@ public class Chambre {
     @ManyToOne
     private Bloc bloc;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "chambre", cascade = CascadeType.ALL)
     private List<Reservation> reservations;
 
     public long getIdChambre() {

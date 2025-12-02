@@ -2,15 +2,18 @@ package tn.esprit.tnfoyer.services.implementation;
 
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
+import tn.esprit.tnfoyer.dto.FoyerDTO;
 import tn.esprit.tnfoyer.entities.Bloc;
 import tn.esprit.tnfoyer.entities.Foyer;
 import tn.esprit.tnfoyer.entities.Universite;
+import tn.esprit.tnfoyer.mapper.FoyerMapper;
 import tn.esprit.tnfoyer.repositories.BlocRepository;
 import tn.esprit.tnfoyer.repositories.FoyerRepository;
 import tn.esprit.tnfoyer.repositories.UniversiteRepository;
 import tn.esprit.tnfoyer.services.interfaces.IFoyerService;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class FoyerService implements IFoyerService {
@@ -18,11 +21,13 @@ public class FoyerService implements IFoyerService {
     private final FoyerRepository foyerRepository;
     private final BlocRepository blocRepository;
     private final UniversiteRepository universiteRepository;
+    private final FoyerMapper foyerMapper;
 
-    public FoyerService(FoyerRepository foyerRepository, BlocRepository blocRepository, UniversiteRepository universiteRepository) {
+    public FoyerService(FoyerRepository foyerRepository, BlocRepository blocRepository, UniversiteRepository universiteRepository, FoyerMapper foyerMapper) {
         this.foyerRepository = foyerRepository;
         this.blocRepository = blocRepository;
         this.universiteRepository = universiteRepository;
+        this.foyerMapper = foyerMapper;
     }
 
     @Override
@@ -70,17 +75,24 @@ public class FoyerService implements IFoyerService {
     @Override
     @Transactional
     public Foyer ajouterFoyerEtAffecterAUniversite(Foyer foyer, long idUniversite) {
-        Universite universite = universiteRepository.findById(idUniversite).get();
+        Universite universite = universiteRepository.findById(idUniversite).orElseThrow();
 
-        List<Bloc> blocs = foyer.getBlocs();
-        if (blocs != null) {
-            for (Bloc b : blocs) {
-                b.setFoyer(foyer);
-                blocRepository.save(b);
+        List<Bloc> blocsInput = foyer.getBlocs();
+        if (blocsInput != null) {
+            List<Bloc> blocsManaged = new java.util.ArrayList<>(blocsInput.size());
+            for (Bloc b : blocsInput) {
+                if (b.getIdBloc() == 0) {
+                    b.setFoyer(foyer);
+                    blocsManaged.add(b);
+                } else {
+                    Bloc bm = blocRepository.findById(b.getIdBloc()).get();
+                    bm.setFoyer(foyer);
+                    blocsManaged.add(bm);
+                }
             }
+            foyer.setBlocs(blocsManaged);
         }
 
-        foyer.setUniversite(universite);
         Foyer savedFoyer = foyerRepository.save(foyer);
 
         universite.setFoyer(savedFoyer);
@@ -89,4 +101,26 @@ public class FoyerService implements IFoyerService {
         return savedFoyer;
     }
 
+    @Override
+    public FoyerDTO addOrUpdateFoyer(FoyerDTO foyerDTO) {
+        Foyer foyer = foyerMapper.toEntity(foyerDTO);
+
+        Foyer saved = foyerRepository.save(foyer);
+        return foyerMapper.toDto(saved);
+    }
+
+    @Override
+    public List<FoyerDTO> findAllFoyers() {
+        return foyerRepository.findAll()
+                .stream()
+                .map(foyerMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public FoyerDTO findById(long idFoyer) {
+        Foyer foyer = foyerRepository.findById(idFoyer)
+                .orElseThrow(() -> new RuntimeException("Foyer introuvable avec ID : " + idFoyer));
+        return foyerMapper.toDto(foyer);
+    }
 }
