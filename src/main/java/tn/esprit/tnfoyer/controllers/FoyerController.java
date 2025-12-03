@@ -48,7 +48,7 @@ public class FoyerController {
     }
 
     @GetMapping("/plus-de-chambre")
-    public Foyer getFoyerPlusDeChambre() {
+    public List<Foyer> getFoyerPlusDeChambre() {
         return foyerService.findFoyerAvecPlusDeChambres();
     }
 

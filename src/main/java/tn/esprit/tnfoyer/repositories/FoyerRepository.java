@@ -21,6 +21,6 @@ public interface FoyerRepository extends JpaRepository<Foyer, Long> {
             "join b.chambres c " +
             "group by f " +
             "order by count(c) desc")
-    Foyer findFoyerWithMostChambres();
+    List<Foyer> findFoyerWithMostChambres();
 
 }

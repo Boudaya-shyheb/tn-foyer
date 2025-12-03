@@ -125,7 +125,7 @@ public class FoyerService implements IFoyerService {
     }
 
     @Override
-    public Foyer findFoyerAvecPlusDeChambres() {
+    public List<Foyer> findFoyerAvecPlusDeChambres() {
         return foyerRepository.findFoyerWithMostChambres();
     }
 
