@@ -1,6 +1,7 @@
 package tn.esprit.tnfoyer.repositories;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import tn.esprit.tnfoyer.entities.Foyer;
 
@@ -13,4 +14,13 @@ public interface FoyerRepository extends JpaRepository<Foyer, Long> {
 
 
     Foyer findFoyerByNomFoyer(String nomFoyer);
+
+    @Query("select f " +
+            "from Foyer f " +
+            "join f.blocs b " +
+            "join b.chambres c " +
+            "group by f " +
+            "order by count(c) desc")
+    Foyer findFoyerWithMostChambres();
+
 }

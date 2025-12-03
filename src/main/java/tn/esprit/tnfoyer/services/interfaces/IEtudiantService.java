@@ -3,6 +3,7 @@ package tn.esprit.tnfoyer.services.interfaces;
 import tn.esprit.tnfoyer.dto.EtudiantDTO;
 import tn.esprit.tnfoyer.entities.Etudiant;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public interface IEtudiantService {
@@ -15,4 +16,7 @@ public interface IEtudiantService {
     EtudiantDTO addOrUpdateEtudiant(EtudiantDTO etudiantDTO);
     List<EtudiantDTO> findAllEtudiants();
     EtudiantDTO findById(long idEtudiant);
+    List<Etudiant> getEtudiantsAvecReservationValideeParAnnee(LocalDate annee);
+    List<Etudiant> getEtudiantsSansReservations();
+
 }

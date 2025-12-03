@@ -124,5 +124,9 @@ public class FoyerService implements IFoyerService {
         return foyerMapper.toDto(foyer);
     }
 
+    @Override
+    public Foyer findFoyerAvecPlusDeChambres() {
+        return foyerRepository.findFoyerWithMostChambres();
+    }
 
 }

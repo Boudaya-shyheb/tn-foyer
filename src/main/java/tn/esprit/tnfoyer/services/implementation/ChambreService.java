@@ -13,7 +13,9 @@ import tn.esprit.tnfoyer.services.interfaces.IChambreService;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -126,6 +128,27 @@ public class ChambreService implements IChambreService {
         Chambre chambre = chambreRepository.findById(idChambre)
                 .orElseThrow(() -> new RuntimeException("Chambre non trouvée"));
         return chambreMapper.toDto(chambre);
+    }
+
+    @Override
+    public Chambre findByCinEtudiant(long cinEtudiant){
+        return chambreRepository.findChambreByReservationsEtudiantsCin(cinEtudiant);
+    }
+
+    @Override
+    public Map<TypeChambre, Long> countChambresParTypeDansUniversite(String nomUniversite) {
+        Map<TypeChambre, Long> result = new EnumMap<>(TypeChambre.class);
+        for (Object[] row : chambreRepository.countChambresByTypeInUniversite(nomUniversite)) {
+            TypeChambre type = (TypeChambre) row[0];
+            Long total = (Long) row[1];
+            result.put(type, total);
+        }
+        return result;
+    }
+
+    @Override
+    public List<Chambre> getChambresSansReservationValide() {
+        return chambreRepository.findChambresSansReservationValide();
     }
 
 }

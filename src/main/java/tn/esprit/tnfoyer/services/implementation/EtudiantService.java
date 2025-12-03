@@ -7,6 +7,7 @@ import tn.esprit.tnfoyer.mapper.EtudiantMapper;
 import tn.esprit.tnfoyer.repositories.EtudiantRepository;
 import tn.esprit.tnfoyer.services.interfaces.IEtudiantService;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -83,6 +84,16 @@ public class EtudiantService implements IEtudiantService {
         Etudiant etudiant = etudiantRepository.findById(idEtudiant)
                 .orElseThrow(() -> new RuntimeException("Étudiant non trouvé"));
         return etudiantMapper.toDto(etudiant);
+    }
+
+    @Override
+    public List<Etudiant> getEtudiantsAvecReservationValideeParAnnee(LocalDate annee) {
+        return etudiantRepository.findEtudiantsWithValidReservationInYear(annee);
+    }
+
+    @Override
+    public List<Etudiant> getEtudiantsSansReservations() {
+        return etudiantRepository.findEtudiantsSansReservations();
     }
 
 }

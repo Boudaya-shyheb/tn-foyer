@@ -16,4 +16,5 @@ public interface IFoyerService {
     FoyerDTO addOrUpdateFoyer(FoyerDTO foyerDTO);
     List<FoyerDTO> findAllFoyers();
     FoyerDTO findById(long idFoyer);
+    Foyer findFoyerAvecPlusDeChambres();
 }

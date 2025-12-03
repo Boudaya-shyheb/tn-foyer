@@ -58,4 +58,10 @@ public class ChambreController {
                                                                             @RequestParam("type") TypeChambre type) {
         return chambreService.getChambresNonReserveParNomFoyerEtTypeChambre(nomUniversite, type);
     }
+
+    @GetMapping("/par-cin-etudiant")
+    public Chambre findByCinEtudiant(@RequestParam("cinEtudiant") long cinEtudiant) {
+        return chambreService.findByCinEtudiant(cinEtudiant);
+    }
+
 }
