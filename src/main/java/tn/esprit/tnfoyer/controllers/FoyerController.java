@@ -46,4 +46,10 @@ public class FoyerController {
                                                    @RequestParam("idUniversite") long idUniversite) {
         return foyerService.ajouterFoyerEtAffecterAUniversite(foyer, idUniversite);
     }
+
+    @GetMapping("/plus-de-chambre")
+    public Foyer getFoyerPlusDeChambre() {
+        return foyerService.findFoyerAvecPlusDeChambres();
+    }
+
 }

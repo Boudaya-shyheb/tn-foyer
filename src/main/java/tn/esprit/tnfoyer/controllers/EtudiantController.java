@@ -4,6 +4,7 @@ import org.springframework.web.bind.annotation.*;
 import tn.esprit.tnfoyer.entities.Etudiant;
 import tn.esprit.tnfoyer.services.implementation.EtudiantService;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -40,4 +41,16 @@ public class EtudiantController {
     public List<Etudiant> getAllEtudiants() {
         return etudiantService.getAllEtudiant();
     }
+
+    @GetMapping("/Reservation-valide/par-Année")
+    public List<Etudiant> getEtudiantAvecReservationParAnnee(){
+        return etudiantService.getEtudiantsAvecReservationValideeParAnnee(LocalDate.now());
+    }
+
+    @GetMapping("/sans-res")
+    public List<Etudiant> getEtudiantSansReservation(){
+        return etudiantService.getEtudiantsSansReservations();
+    }
+
+
 }

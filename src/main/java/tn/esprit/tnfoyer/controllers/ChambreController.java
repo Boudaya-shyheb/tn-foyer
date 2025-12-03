@@ -6,6 +6,7 @@ import tn.esprit.tnfoyer.entities.TypeChambre;
 import tn.esprit.tnfoyer.services.implementation.ChambreService;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/chambres")
@@ -62,6 +63,16 @@ public class ChambreController {
     @GetMapping("/par-cin-etudiant")
     public Chambre findByCinEtudiant(@RequestParam("cinEtudiant") long cinEtudiant) {
         return chambreService.findByCinEtudiant(cinEtudiant);
+    }
+
+    @GetMapping("/chambres-sans-res")
+    public List<Chambre> getChambresSansRes(){
+        return chambreService.getChambresSansReservationValide();
+    }
+
+    @GetMapping("/count-Chambres")
+    public Map<TypeChambre, Long> countChambresByType(@RequestParam("nomUniversite") String nomUniversite){
+        return chambreService.countChambresParTypeDansUniversite(nomUniversite);
     }
 
 }
