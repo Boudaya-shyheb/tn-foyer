@@ -18,7 +18,7 @@ pipeline {
     stage('Compile Stage') {
       steps {
         // -B pour build non-interactif
-        sh 'mvn -B clean compile'
+        bat 'mvn -B clean compile'
       }
     }
   }
