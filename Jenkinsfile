@@ -24,6 +24,20 @@ pipeline {
       }
     }
 
+    stage('SonarQube Analysis') {
+      steps {
+        withSonarQubeEnv('SonarQube') {
+          bat '''
+          mvn sonar:sonar ^
+            -Dsonar.projectKey=tn-foyer ^
+            -Dsonar.projectName=mon projet
+          '''
+        }
+      }
+    }
+  }
+
+    
     stage('Build & Test - Maven') {
       steps {
         echo "Lancement du build Maven..."
@@ -70,19 +84,7 @@ pipeline {
       }
     }
 
-     stage('SonarQube Analysis') {
-      steps {
-        withSonarQubeEnv('SonarQube') {
-          bat '''
-          mvn sonar:sonar ^
-            -Dsonar.projectKey=tn-foyer ^
-            -Dsonar.projectName=mon projet
-          '''
-        }
-      }
-    }
-  }
-
+     
   }
 
   post {
@@ -93,4 +95,4 @@ pipeline {
       echo "Pipeline échoué. Vérifie les logs."
     }
   }
-}*
+}
