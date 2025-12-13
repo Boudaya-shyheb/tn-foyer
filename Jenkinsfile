@@ -11,7 +11,7 @@ pipeline {
   stages {
     stage('GIT stage') {
       steps {
-        git branch: 'main', url: 'https://github.com/Boudaya-shyheb/tn-foyer.git'
+        git branch: 'master', url: 'https://github.com/Boudaya-shyheb/tn-foyer.git'
       }
     }
 
