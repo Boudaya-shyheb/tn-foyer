@@ -35,8 +35,6 @@ pipeline {
         }
       }
     }
-  }
-
     
     stage('Build & Test - Maven') {
       steps {
@@ -83,6 +81,7 @@ pipeline {
         }
       }
     }
+}
 
   post {
     success {
