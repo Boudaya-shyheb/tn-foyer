@@ -84,9 +84,6 @@ pipeline {
       }
     }
 
-     
-  }
-
   post {
     success {
       echo "Pipeline terminé avec succès — image poussée : ${DOCKER_REPO}:${DOCKER_TAG}"
