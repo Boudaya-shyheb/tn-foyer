@@ -48,7 +48,7 @@ pipeline {
   steps {
     script {
       image_tag = "${env.DOCKER_REPO}:${env.DOCKER_TAG}-${env.GIT_COMMIT_SHORT}"
-      echo "Building optimized image: ${env.image_tag}"
+      echo "Building optimized image: ${image_tag}"
       bat "docker build -t env.image_tag ."
     }
   }
