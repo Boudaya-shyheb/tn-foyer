@@ -77,6 +77,18 @@ stage('Push Docker Image') {
     }
   }
   }
+
+  stage('Deploy to Kubernetes') {
+  steps {
+    echo "Déploiement de l'image dans Kubernetes..."
+
+    bat """
+      kubectl set image deployment/spring-app spring-app=${env.image_tag} -n devops
+      kubectl rollout status deployment/spring-app -n devops
+    """
+  }
+}
+    
   }
   post {
     success {
