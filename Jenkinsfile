@@ -32,18 +32,18 @@ pipeline {
     }
 
     stage('SonarQube Analysis') {
-      steps {
-        withSonarQubeEnv('SonarQube') {
-          bat '''
-          mvn sonar:sonar ^
-            -Dsonar.projectKey=tn-foyer ^
-            -Dsonar.projectName="tn-foyer"
-            -Dsonar.java.binaries=target/classes
-
-          '''
-        }
-      }
+  steps {
+    withSonarQubeEnv('SonarQube') {
+      bat '''
+        mvn clean compile sonar:sonar ^
+          -Dsonar.projectKey=tn-foyer ^
+          -Dsonar.projectName=tn-foyer ^
+          -Dsonar.java.binaries=target/classes
+      '''
     }
+  }
+}
+
 
     stage('Build & Test - Maven') {
       steps {
