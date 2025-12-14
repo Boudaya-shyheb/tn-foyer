@@ -47,9 +47,9 @@ pipeline {
    stage('Build Docker Image') {
   steps {
     script {
-      env.IMAGE_TAG = "${env.DOCKER_REPO}:${env.DOCKER_TAG}-${env.GIT_COMMIT_SHORT}"
+      image_tag = "${env.DOCKER_REPO}:${env.DOCKER_TAG}-${env.GIT_COMMIT_SHORT}"
       echo "Building optimized image: ${env.IMAGE_TAG}"
-      bat "docker build -t env.IMAGE_TAG ."
+      bat "docker build -t env.image_tag ."
     }
   }
 }
@@ -65,7 +65,7 @@ stage('Push Docker Image') {
     ]) {
       bat '''
       echo Zimbabwe17* | docker login -u boudayashyheb --password-stdin
-      docker push env.IMAGE_TAG
+      docker push env.image_tag
       docker logout
       '''
     }
