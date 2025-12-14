@@ -48,7 +48,7 @@ pipeline {
   steps {
     script {
       image_tag = "${env.DOCKER_REPO}:${env.DOCKER_TAG}-${env.GIT_COMMIT_SHORT}"
-      echo "Building optimized image: ${env.IMAGE_TAG}"
+      echo "Building optimized image: ${env.image_tag}"
       bat "docker build -t env.image_tag ."
     }
   }
@@ -74,7 +74,7 @@ stage('Push Docker Image') {
   }
   post {
     success {
-      echo "Pipeline terminé avec succès — image poussée : ${IMAGE_TAG_COMMIT}"
+      echo "Pipeline terminé avec succès — image poussée"
     }
     failure {
       echo "Pipeline échoué. Vérifie les logs."
