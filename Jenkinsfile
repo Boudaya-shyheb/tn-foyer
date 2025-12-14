@@ -73,7 +73,7 @@ stage('Push Docker Image') {
     ]) {
       bat '''
       echo Zimbabwe17* | docker login -u boudayashyheb --password-stdin
-      docker push ${env.image_tag}
+      docker push %image_tag%
       '''
     }
   }
