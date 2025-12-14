@@ -1,4 +1,4 @@
 FROM alpine
-RUN add apk openjdk17
+RUN apk add openjdk17
 EXPOSE 80
 CMD "java"
