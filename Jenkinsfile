@@ -78,7 +78,7 @@ stage('Push Docker Image') {
   }
   }
 
-  stage('Deploy to Kubernetes') {
+  stage('Deploiement Kubernetes') {
   steps {
     echo "Déploiement de l'image dans Kubernetes..."
 
