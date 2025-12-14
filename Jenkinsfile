@@ -38,6 +38,8 @@ pipeline {
           mvn sonar:sonar ^
             -Dsonar.projectKey=tn-foyer ^
             -Dsonar.projectName="tn-foyer"
+            -Dsonar.java.binaries=target/classes
+
           '''
         }
       }
