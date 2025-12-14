@@ -44,37 +44,34 @@ pipeline {
       }
     }
 
-    stage('Build Docker Image') {
-      steps {
-        script {
-          env.IMAGE_TAG_LATEST = "${env.DOCKER_REPO}:${env.DOCKER_TAG}"
-          env.IMAGE_TAG_COMMIT = "${env.DOCKER_REPO}:${env.DOCKER_TAG}-${env.GIT_COMMIT_SHORT}"
-
-          echo "Build Docker image: ${env.IMAGE_TAG_COMMIT}"
-          bat "docker build -t ${env.IMAGE_TAG_COMMIT} ."
-        }
-      }
-    }
-
-    stage('Push Docker Image') {
-      steps {
-        withCredentials([
-          usernamePassword(
-            credentialsId: env.DOCKER_CREDENTIALS_ID,
-            usernameVariable: 'shyheb',
-            passwordVariable: 'shyheb123*'
-          )
-        ]) {
-          bat '''
-          echo Zimbabwe17* | docker login -u boudayashyheb --password-stdin
-          docker push %IMAGE_TAG_COMMIT%
-          docker logout
-          '''
-        }
-      }
+   stage('Build Docker Image') {
+  steps {
+    script {
+      env.IMAGE_TAG = "${env.DOCKER_REPO}:${env.DOCKER_TAG}-${env.GIT_COMMIT_SHORT}"
+      echo "Building optimized image: ${env.IMAGE_TAG}"
+      bat "docker build -t env.IMAGE_TAG ."
     }
   }
+}
 
+stage('Push Docker Image') {
+  steps {
+    withCredentials([
+      usernamePassword(
+        credentialsId: env.DOCKER_CREDENTIALS_ID,
+        usernameVariable: 'shyheb',
+        passwordVariable: 'shyheb123*'
+      )
+    ]) {
+      bat '''
+      echo Zimbabwe17* | docker login -u boudayashyheb --password-stdin
+      docker push env.IMAGE_TAG
+      docker logout
+      '''
+    }
+  }
+  }
+  }
   post {
     success {
       echo "Pipeline terminé avec succès — image poussée : ${IMAGE_TAG_COMMIT}"
