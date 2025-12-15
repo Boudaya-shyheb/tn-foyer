@@ -31,6 +31,13 @@ pipeline {
       }
     }
 
+    stage('Build & Test - Maven') {
+      steps {
+        echo "Lancement du build Maven..."
+        bat "mvn -B clean verify"
+      }
+    }
+
     stage('SonarQube Analysis') {
   steps {
     withSonarQubeEnv('SonarQube') {
@@ -43,14 +50,6 @@ pipeline {
     }
   }
 }
-
-
-    stage('Build & Test - Maven') {
-      steps {
-        echo "Lancement du build Maven..."
-        bat "mvn -B clean compile"
-      }
-    }
 
    stage('Build Docker Image') {
       steps {
@@ -89,6 +88,9 @@ stage('Push Docker Image') {
     
   }
   post {
+    always{
+      junit '**/target/surefire-reports/*.xml'
+    }
     success {
       echo "Pipeline terminé avec succès — image poussée"
     }
