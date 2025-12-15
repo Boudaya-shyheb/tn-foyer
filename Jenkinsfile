@@ -20,7 +20,7 @@ pipeline {
             }
         }
 
-        stage('Checkout Code') {
+        stage('Checkout') {
             steps {
                 checkout scm
                 script {
