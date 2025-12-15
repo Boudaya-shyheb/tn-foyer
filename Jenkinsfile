@@ -24,24 +24,26 @@ pipeline {
       steps {
         checkout scm
         script {
-          // Jenkins fournit GIT_COMMIT automatiquement
           env.GIT_COMMIT_SHORT = env.GIT_COMMIT.take(7)
-          echo "Commit short: ${env.GIT_COMMIT_SHORT}"
+          env.IMAGE_TAG = "${env.DOCKER_REPO}:${env.DOCKER_TAG}-${env.GIT_COMMIT_SHORT}"
+          echo "Image tag: ${env.IMAGE_TAG}"
         }
       }
     }
 
     stage('SonarQube Analysis') {
-      steps {
-        withSonarQubeEnv('SonarQube') {
-          bat '''
-          mvn sonar:sonar ^
-            -Dsonar.projectKey=tn-foyer ^
-            -Dsonar.projectName="tn-foyer"
-          '''
-        }
-      }
+  steps {
+    withSonarQubeEnv('SonarQube') {
+      bat '''
+        mvn clean compile sonar:sonar ^
+          -Dsonar.projectKey=tn-foyer ^
+          -Dsonar.projectName=tn-foyer ^
+          -Dsonar.java.binaries=target/classes
+      '''
     }
+  }
+}
+
 
     stage('Build & Test - Maven') {
       steps {
@@ -51,14 +53,10 @@ pipeline {
     }
 
    stage('Build Docker Image') {
-  steps {
-    script {
-      def image_tag = "${env.DOCKER_REPO}:${env.DOCKER_TAG}-${env.GIT_COMMIT_SHORT}"
-      echo "Building optimized image: ${image_tag}"
-      bat "docker build -t ${image_tag} ."
+      steps {
+        bat 'docker build -t %IMAGE_TAG% .'
+      }
     }
-  }
-}
 
 stage('Push Docker Image') {
   steps {
@@ -70,13 +68,25 @@ stage('Push Docker Image') {
       )
     ]) {
       bat '''
-      echo Zimbabwe17* | docker login -u boudayashyheb --password-stdin
-      docker push ${env.image_tag}
-      docker logout
+            echo %DOCKER_PASS% | docker login -u %DOCKER_USER% --password-stdin
+            docker push %IMAGE_TAG%
+            docker logout
       '''
     }
   }
   }
+
+  stage('Deploiement Kubernetes') {
+  steps {
+    echo "Déploiement de l'image dans Kubernetes..."
+
+    bat """
+      kubectl set image deployment/spring-app spring-app=%IMAGE_TAG% -n devops
+      kubectl rollout status deployment/spring-app -n devops
+    """
+  }
+}
+    
   }
   post {
     success {
