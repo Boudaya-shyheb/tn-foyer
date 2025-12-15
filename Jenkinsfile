@@ -34,7 +34,14 @@ pipeline {
     stage('Build & Test - Maven') {
       steps {
         echo "Lancement du build Maven..."
-        bat "mvn -B clean verify"
+        bat '''
+mvn -B clean verify ^
+ -Dspring.datasource.url=jdbc:h2:mem:testdb ^
+ -Dspring.datasource.driver-class-name=org.h2.Driver ^
+ -Dspring.jpa.database-platform=org.hibernate.dialect.H2Dialect ^
+ -Dspring.jpa.hibernate.ddl-auto=create-drop
+'''
+
       }
     }
 
