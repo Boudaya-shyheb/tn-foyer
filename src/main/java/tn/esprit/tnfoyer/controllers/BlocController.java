@@ -40,7 +40,7 @@ public class BlocController {
         return blocService.getBloc(id);
     }
 
-    @GetMapping
+    @GetMapping("/all")
     public List<Bloc> getAllBlocs() {
         return blocService.getAllBloc();
     }
