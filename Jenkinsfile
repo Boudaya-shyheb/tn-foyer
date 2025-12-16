@@ -20,6 +20,26 @@ pipeline {
             }
         }
 
+
+        stage('start grafana + prometheus') {
+            steps {
+                echo " démarrage automatique grafana & prometheus "
+                bat '''
+                cd C:/monitoring
+                docker compose up -d
+                '''
+            }
+        }
+
+        stage('wait for monitor') {
+            steps {
+                echo " Attente du moniteur "
+                bat '''
+                timeout /t 10
+                '''
+            }
+        }
+
         stage('Checkout') {
             steps {
                 checkout scm
