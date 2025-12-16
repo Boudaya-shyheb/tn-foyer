@@ -31,15 +31,6 @@ pipeline {
             }
         }
 
-        stage('wait for monitor') {
-            steps {
-                echo " Attente du moniteur "
-                bat '''
-                timeout /t 10
-                '''
-            }
-        }
-
         stage('Checkout') {
             steps {
                 checkout scm
